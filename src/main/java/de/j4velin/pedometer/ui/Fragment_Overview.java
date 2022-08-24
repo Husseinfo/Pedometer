@@ -113,8 +113,6 @@ public class Fragment_Overview extends Fragment implements SensorEventListener {
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
-
         Database db = Database.getInstance(getActivity());
 
         if (BuildConfig.DEBUG) db.logState();

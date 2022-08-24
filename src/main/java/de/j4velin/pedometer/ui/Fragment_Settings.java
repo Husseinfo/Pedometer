@@ -124,7 +124,6 @@ public class Fragment_Settings extends PreferenceFragment implements OnPreferenc
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
         if (Build.VERSION.SDK_INT >= 26) { // notification settings might have changed
             API26Wrapper.startForegroundService(getActivity(),
                     new Intent(getActivity(), SensorListener.class));
