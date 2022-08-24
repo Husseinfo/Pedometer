@@ -1,11 +1,7 @@
 buildscript {
     repositories {
         google()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         if (rootProject.ext.has("gradle_classpath")) {
@@ -26,8 +22,8 @@ android {
         buildToolsVersion rootProject.ext.buildToolsVersion
     } else {
         logger.warn('compileSdkVersion not found in rootProject')
-        compileSdkVersion = 27
-        buildToolsVersion = "27.0.3"
+        compileSdkVersion = 33
+        buildToolsVersion = "33.0.0"
     }
 
     defaultConfig {
@@ -50,7 +46,7 @@ android {
         }
     }
 
-    lintOptions{
+    lintOptions {
         disable 'MissingTranslation'
         disable 'ExtraTranslation'
     }
@@ -74,21 +70,14 @@ android {
 
 repositories {
     google()
-    maven {
-        url 'https://maven.google.com/'
-        name 'Google'
-    }
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'androidx.appcompat:appcompat:1.5.0'
     implementation 'com.github.j4velin.colorpicker:colorpicker:1.20.6'
     implementation 'com.github.j4velin.EazeGraph:EazeGraph:1.0.3'
     implementation 'com.google.android.apps.dashclock:dashclock-api:2.0.0'
-    playImplementation 'com.google.android.gms:play-services-fitness:15.0.1'
-    playImplementation 'com.google.android.gms:play-services-games:15.0.1'
-    playImplementation 'com.google.android.gms:play-services-identity:15.0.1'
 }
 
 def props = new Properties()
