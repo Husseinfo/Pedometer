@@ -20,7 +20,6 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
@@ -83,16 +82,6 @@ public class Activity_Main extends FragmentActivity {
                         .replace(android.R.id.content, new Fragment_Settings()).addToBackStack(null)
                         .commit();
                 break;
-            case R.id.action_leaderboard:
-            case R.id.action_achievements:
-                AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
-                builder2.setTitle("Google services required");
-                builder2.setMessage(
-                        "This feature is not available on the F-Droid version of the app");
-                builder2.setNegativeButton(android.R.string.ok,
-                        (dialog, which) -> dialog.dismiss());
-                builder2.create().show();
-                break;
             case R.id.action_faq:
                 startActivity(new Intent(Intent.ACTION_VIEW,
                         Uri.parse("http://j4velin.de/faq/index.php?app=pm"))
@@ -115,12 +104,7 @@ public class Activity_Main extends FragmentActivity {
                 tv.setMovementMethod(LinkMovementMethod.getInstance());
                 builder.setView(tv);
                 builder.setPositiveButton(android.R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(final DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
+                        (dialog, which) -> dialog.dismiss());
                 builder.create().show();
                 break;
         }
