@@ -33,7 +33,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -95,12 +94,9 @@ public class Fragment_Overview extends Fragment implements SensorEventListener {
         sliceGoal = new PieModel("", Fragment_Settings.DEFAULT_GOAL, Color.parseColor("#CC0000"));
         pg.addPieSlice(sliceGoal);
 
-        pg.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-                showSteps = !showSteps;
-                stepsDistanceChanged();
-            }
+        pg.setOnClickListener(view -> {
+            showSteps = !showSteps;
+            stepsDistanceChanged();
         });
 
         pg.setDrawValueInPie(false);
@@ -321,12 +317,7 @@ public class Fragment_Overview extends Fragment implements SensorEventListener {
             }
         }
         if (barChart.getData().size() > 0) {
-            barChart.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-                    Dialog_Statistics.getDialog(getActivity(), since_boot).show();
-                }
-            });
+            barChart.setOnClickListener(v -> Dialog_Statistics.getDialog(getActivity(), since_boot).show());
             barChart.startAnimation();
         } else {
             barChart.setVisibility(View.GONE);
