@@ -55,7 +55,6 @@ import de.j4velin.pedometer.R;
 import de.j4velin.pedometer.SensorListener;
 import de.j4velin.pedometer.util.API23Wrapper;
 import de.j4velin.pedometer.util.API26Wrapper;
-import de.j4velin.pedometer.util.PlaySettingsWrapper;
 
 public class Fragment_Settings extends PreferenceFragment implements OnPreferenceClickListener {
 
@@ -98,10 +97,6 @@ public class Fragment_Settings extends PreferenceFragment implements OnPreferenc
                     });
         }
 
-        Preference account = findPreference("account");
-        PlaySettingsWrapper
-                .setupAccountSetting(account, savedInstanceState, (Activity_Main) getActivity());
-
         Preference goal = findPreference("goal");
         goal.setOnPreferenceClickListener(this);
         goal.setSummary(getString(R.string.goal_summary, prefs.getInt("goal", DEFAULT_GOAL)));
@@ -113,12 +108,6 @@ public class Fragment_Settings extends PreferenceFragment implements OnPreferenc
                 prefs.getString("stepsize_unit", DEFAULT_STEP_UNIT)));
 
         setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onSaveInstanceState(final Bundle outState) {
-        super.onSaveInstanceState(outState);
-        PlaySettingsWrapper.onSavedInstance(outState, (Activity_Main) getActivity());
     }
 
     @Override

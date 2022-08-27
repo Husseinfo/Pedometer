@@ -17,17 +17,12 @@
 package de.j4velin.pedometer.ui;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import androidx.core.content.PermissionChecker;
 import androidx.fragment.app.FragmentActivity;
@@ -81,31 +76,6 @@ public class Activity_Main extends FragmentActivity {
                 getFragmentManager().beginTransaction()
                         .replace(android.R.id.content, new Fragment_Settings()).addToBackStack(null)
                         .commit();
-                break;
-            case R.id.action_faq:
-                startActivity(new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("http://j4velin.de/faq/index.php?app=pm"))
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                break;
-            case R.id.action_about:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(R.string.about);
-                TextView tv = new TextView(this);
-                tv.setPadding(10, 10, 10, 10);
-                tv.setText(R.string.about_text_links);
-                try {
-                    tv.append(getString(R.string.about_app_version,
-                            getPackageManager().getPackageInfo(getPackageName(), 0).versionName));
-                } catch (NameNotFoundException e1) {
-                    // should not happen as the app is definitely installed when
-                    // seeing the dialog
-                    e1.printStackTrace();
-                }
-                tv.setMovementMethod(LinkMovementMethod.getInstance());
-                builder.setView(tv);
-                builder.setPositiveButton(android.R.string.ok,
-                        (dialog, which) -> dialog.dismiss());
-                builder.create().show();
                 break;
         }
         return true;

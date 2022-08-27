@@ -1,12 +1,12 @@
 /*
  * Copyright 2014 Thomas Hoffmann
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -65,30 +64,22 @@ abstract class Dialog_Split {
 
         final Button startstop = (Button) d.findViewById(R.id.start);
         startstop.setText(split_active ? R.string.stop : R.string.start);
-        startstop.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                if (!split_active) {
-                    prefs.edit().putLong("split_date", System.currentTimeMillis())
-                            .putInt("split_steps", totalSteps).apply();
-                    split_active = true;
-                    d.dismiss();
-                } else {
-                    started.setVisibility(View.GONE);
-                    stopped.setVisibility(View.VISIBLE);
-                    prefs.edit().remove("split_date").remove("split_steps").apply();
-                    split_active = false;
-                }
-                startstop.setText(split_active ? R.string.stop : R.string.start);
+        startstop.setOnClickListener(v -> {
+            if (!split_active) {
+                prefs.edit().putLong("split_date", System.currentTimeMillis())
+                        .putInt("split_steps", totalSteps).apply();
+                split_active = true;
+                d.dismiss();
+            } else {
+                started.setVisibility(View.GONE);
+                stopped.setVisibility(View.VISIBLE);
+                prefs.edit().remove("split_date").remove("split_steps").apply();
+                split_active = false;
             }
+            startstop.setText(split_active ? R.string.stop : R.string.start);
         });
 
-        d.findViewById(R.id.close).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                d.dismiss();
-            }
-        });
+        d.findViewById(R.id.close).setOnClickListener(v -> d.dismiss());
 
         return d;
     }
