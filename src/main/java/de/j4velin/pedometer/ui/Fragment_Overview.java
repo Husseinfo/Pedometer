@@ -18,7 +18,6 @@ package de.j4velin.pedometer.ui;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -132,17 +131,7 @@ public class Fragment_Overview extends Fragment implements SensorEventListener {
         if (sensor == null) {
             new AlertDialog.Builder(getActivity()).setTitle(R.string.no_sensor)
                     .setMessage(R.string.no_sensor_explain)
-                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(final DialogInterface dialogInterface) {
-                            getActivity().finish();
-                        }
-                    }).setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(final DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            }).create().show();
+                    .setNeutralButton(android.R.string.ok, (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
         } else {
             sm.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, 0);
         }
