@@ -35,17 +35,6 @@ android {
         release
     }
 
-    flavorDimensions "main"
-
-    productFlavors {
-        play {
-            dimension "main"
-        }
-        fdroid {
-            dimension "main"
-        }
-    }
-
     lintOptions {
         disable 'MissingTranslation'
         disable 'ExtraTranslation'

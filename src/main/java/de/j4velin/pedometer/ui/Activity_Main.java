@@ -90,12 +90,7 @@ public class Activity_Main extends FragmentActivity {
                 builder2.setMessage(
                         "This feature is not available on the F-Droid version of the app");
                 builder2.setNegativeButton(android.R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
+                        (dialog, which) -> dialog.dismiss());
                 builder2.create().show();
                 break;
             case R.id.action_faq:
