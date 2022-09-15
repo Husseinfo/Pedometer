@@ -18,11 +18,9 @@ package de.j4velin.pedometer.ui;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -52,9 +50,7 @@ import java.util.Locale;
 
 import de.j4velin.pedometer.Database;
 import de.j4velin.pedometer.R;
-import de.j4velin.pedometer.SensorListener;
 import de.j4velin.pedometer.util.API23Wrapper;
-import de.j4velin.pedometer.util.API26Wrapper;
 
 public class Fragment_Settings extends PreferenceFragment implements OnPreferenceClickListener {
 
@@ -73,29 +69,6 @@ public class Fragment_Settings extends PreferenceFragment implements OnPreferenc
 
         findPreference("import").setOnPreferenceClickListener(this);
         findPreference("export").setOnPreferenceClickListener(this);
-        if (Build.VERSION.SDK_INT >= 26) {
-            findPreference("notification").setOnPreferenceClickListener(this);
-        } else {
-            findPreference("notification")
-                    .setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                        @Override
-                        public boolean onPreferenceChange(final Preference preference,
-                                                          final Object newValue) {
-                            prefs.edit().putBoolean("notification", (Boolean) newValue).apply();
-
-                            NotificationManager manager = (NotificationManager) getActivity()
-                                    .getSystemService(Context.NOTIFICATION_SERVICE);
-                            if ((Boolean) newValue) {
-                                manager.notify(SensorListener.NOTIFICATION_ID,
-                                        SensorListener.getNotification(getActivity()));
-                            } else {
-                                manager.cancel(SensorListener.NOTIFICATION_ID);
-                            }
-
-                            return true;
-                        }
-                    });
-        }
 
         Preference goal = findPreference("goal");
         goal.setOnPreferenceClickListener(this);
@@ -108,15 +81,6 @@ public class Fragment_Settings extends PreferenceFragment implements OnPreferenc
                 prefs.getString("stepsize_unit", DEFAULT_STEP_UNIT)));
 
         setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (Build.VERSION.SDK_INT >= 26) { // notification settings might have changed
-            API26Wrapper.startForegroundService(getActivity(),
-                    new Intent(getActivity(), SensorListener.class));
-        }
     }
 
     @Override
@@ -151,16 +115,11 @@ public class Fragment_Settings extends PreferenceFragment implements OnPreferenc
                 np.setValue(prefs.getInt("goal", 10000));
                 builder.setView(np);
                 builder.setTitle(R.string.set_goal);
-                builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        np.clearFocus();
-                        prefs.edit().putInt("goal", np.getValue()).commit();
-                        preference.setSummary(getString(R.string.goal_summary, np.getValue()));
-                        dialog.dismiss();
-                        getActivity().startService(new Intent(getActivity(), SensorListener.class)
-                                .putExtra("updateNotificationState", true));
-                    }
+                builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    np.clearFocus();
+                    prefs.edit().putInt("goal", np.getValue()).commit();
+                    preference.setSummary(getString(R.string.goal_summary, np.getValue()));
+                    dialog.dismiss();
                 });
                 builder.setNegativeButton(android.R.string.cancel, new OnClickListener() {
                     @Override
@@ -225,9 +184,6 @@ public class Fragment_Settings extends PreferenceFragment implements OnPreferenc
                     Toast.makeText(getActivity(), R.string.permission_external_storage,
                             Toast.LENGTH_SHORT).show();
                 }
-                break;
-            case R.string.notification_settings:
-                API26Wrapper.launchNotificationSettings(getActivity());
                 break;
         }
         return false;

@@ -12,9 +12,6 @@
         android:summary="@string/sign_in"
         android:title="@string/account"/>
     <Preference
-        android:key="notification"
-        android:title="@string/notification_settings"/>
-    <Preference
         android:key="export"
         android:summary="@string/export_summary"
         android:title="@string/export_title"/>

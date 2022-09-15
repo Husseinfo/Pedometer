@@ -17,15 +17,12 @@
 package de.j4velin.pedometer;
 
 import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -33,13 +30,9 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.IBinder;
 
-import java.text.NumberFormat;
 import java.util.Date;
-import java.util.Locale;
 
-import de.j4velin.pedometer.ui.Activity_Main;
 import de.j4velin.pedometer.util.API23Wrapper;
-import de.j4velin.pedometer.util.API26Wrapper;
 import de.j4velin.pedometer.util.Logger;
 import de.j4velin.pedometer.util.Util;
 import de.j4velin.pedometer.widget.WidgetUpdateService;
@@ -53,7 +46,6 @@ import de.j4velin.pedometer.widget.WidgetUpdateService;
  */
 public class SensorListener extends Service implements SensorEventListener {
 
-    public final static int NOTIFICATION_ID = 1;
     private final static long MICROSECONDS_IN_ONE_MINUTE = 60000000;
     private final static long SAVE_OFFSET_TIME = AlarmManager.INTERVAL_HOUR;
     private final static int SAVE_OFFSET_STEPS = 500;
@@ -82,9 +74,6 @@ public class SensorListener extends Service implements SensorEventListener {
         }
     }
 
-    /**
-     * @return true, if notification was updated
-     */
     private boolean updateIfNecessary() {
         if (steps > lastSaveSteps + SAVE_OFFSET_STEPS ||
                 (steps > 0 && System.currentTimeMillis() > lastSaveTime + SAVE_OFFSET_TIME)) {
@@ -107,21 +96,10 @@ public class SensorListener extends Service implements SensorEventListener {
             db.close();
             lastSaveSteps = steps;
             lastSaveTime = System.currentTimeMillis();
-            showNotification(); // update notification
             WidgetUpdateService.enqueueUpdate(this);
             return true;
         } else {
             return false;
-        }
-    }
-
-    private void showNotification() {
-        if (Build.VERSION.SDK_INT >= 26) {
-            startForeground(NOTIFICATION_ID, getNotification(this));
-        } else if (getSharedPreferences("pedometer", Context.MODE_PRIVATE)
-                .getBoolean("notification", true)) {
-            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
-                    .notify(NOTIFICATION_ID, getNotification(this));
         }
     }
 
@@ -134,9 +112,7 @@ public class SensorListener extends Service implements SensorEventListener {
     public int onStartCommand(final Intent intent, int flags, int startId) {
         reRegisterSensor();
         registerBroadcastReceiver();
-        if (!updateIfNecessary()) {
-            showNotification();
-        }
+        updateIfNecessary();
 
         // restart service every hour to save the current step count
         long nextUpdate = Math.min(Util.getTomorrow(),
@@ -185,40 +161,6 @@ public class SensorListener extends Service implements SensorEventListener {
         }
     }
 
-    public static Notification getNotification(final Context context) {
-        if (BuildConfig.DEBUG) Logger.log("getNotification");
-        SharedPreferences prefs = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE);
-        int goal = prefs.getInt("goal", 10000);
-        Database db = Database.getInstance(context);
-        int today_offset = db.getSteps(Util.getToday());
-        if (steps == 0)
-            steps = db.getCurrentSteps(); // use saved value if we haven't anything better
-        db.close();
-        Notification.Builder notificationBuilder =
-                Build.VERSION.SDK_INT >= 26 ? API26Wrapper.getNotificationBuilder(context) :
-                        new Notification.Builder(context);
-        if (steps > 0) {
-            if (today_offset == Integer.MIN_VALUE) today_offset = -steps;
-            NumberFormat format = NumberFormat.getInstance(Locale.getDefault());
-            notificationBuilder.setProgress(goal, today_offset + steps, false).setContentText(
-                    today_offset + steps >= goal ?
-                            context.getString(R.string.goal_reached_notification,
-                                    format.format((today_offset + steps))) :
-                            context.getString(R.string.notification_text,
-                                    format.format((goal - today_offset - steps)))).setContentTitle(
-                    format.format(today_offset + steps) + " " + context.getString(R.string.steps));
-        } else { // still no step value?
-            notificationBuilder.setContentText(
-                    context.getString(R.string.your_progress_will_be_shown_here_soon))
-                    .setContentTitle(context.getString(R.string.notification_title));
-        }
-        notificationBuilder.setPriority(Notification.PRIORITY_MIN).setShowWhen(false)
-                .setContentIntent(PendingIntent
-                        .getActivity(context, 0, new Intent(context, Activity_Main.class),
-                                PendingIntent.FLAG_UPDATE_CURRENT))
-                .setSmallIcon(R.drawable.ic_notification).setOngoing(true);
-        return notificationBuilder.build();
-    }
 
     private void registerBroadcastReceiver() {
         if (BuildConfig.DEBUG) Logger.log("register broadcastreceiver");
