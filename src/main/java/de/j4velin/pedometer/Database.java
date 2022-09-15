@@ -310,15 +310,6 @@ public class Database extends SQLiteOpenHelper {
     }
 
     /**
-     * Removes invalid entries from the database.
-     * <p/>
-     * Currently, an invalid input is such with steps >= 200,000
-     */
-    public void removeInvalidEntries() {
-        getWritableDatabase().delete(DB_NAME, "steps >= ?", new String[]{"200000"});
-    }
-
-    /**
      * Get the number of 'valid' days (= days with a step value > 0).
      * <p/>
      * The current day is not added to this number.

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_vertical|center_horizontal"
-    android:orientation="vertical" >
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/widgetsteps"
@@ -15,12 +15,13 @@
         android:shadowDx="0"
         android:shadowDy="2"
         android:shadowRadius="3"
-        android:textSize="20sp" />
+        android:text="123" />
 
     <TextView
         android:id="@+id/widgettext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="3dp"
         android:gravity="center_horizontal"
         android:shadowColor="#000"
         android:shadowDx="0"
