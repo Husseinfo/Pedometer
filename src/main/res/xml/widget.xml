@@ -3,7 +3,7 @@
     android:initialLayout="@layout/widget"
     android:minHeight="40dp"
     android:minWidth="40dp"
-    android:previewImage="@mipmap/ic_launcher"
+    android:previewImage="@drawable/ic_baseline_directions_walk_24"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="120000"
     android:widgetCategory="keyguard|home_screen" >

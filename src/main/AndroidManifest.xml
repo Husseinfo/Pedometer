@@ -17,7 +17,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_baseline_directions_walk_24"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.DeviceDefault.Light.DarkActionBar"
         tools:replace="label">
