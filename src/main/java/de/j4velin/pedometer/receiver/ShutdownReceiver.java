@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package de.j4velin.pedometer;
+package de.j4velin.pedometer.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import de.j4velin.pedometer.BuildConfig;
+import de.j4velin.pedometer.Database;
+import de.j4velin.pedometer.SensorListener;
 import de.j4velin.pedometer.util.Logger;
 import de.j4velin.pedometer.util.Util;
 
-public class ShutdownRecevier extends BroadcastReceiver {
+public class ShutdownReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
@@ -36,7 +39,7 @@ public class ShutdownRecevier extends BroadcastReceiver {
         // setting on the next boot and displays an error message if it's not
         // set to true
         context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                .putBoolean("correctShutdown", true).commit();
+                .putBoolean("correctShutdown", true).apply();
 
         Database db = Database.getInstance(context);
         // if it's already a new day, add the temp. steps to the last one
@@ -49,5 +52,4 @@ public class ShutdownRecevier extends BroadcastReceiver {
         // current steps will be reset on boot @see BootReceiver
         db.close();
     }
-
 }

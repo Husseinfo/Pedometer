@@ -7,7 +7,7 @@
     android:orientation="horizontal">
 
     <TextView
-        android:id="@+id/widgetsteps"
+        android:id="@+id/widget_steps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -15,10 +15,9 @@
         android:shadowDx="0"
         android:shadowDy="2"
         android:shadowRadius="3"
-        android:text="123" />
+        android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/widgettext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="3dp"

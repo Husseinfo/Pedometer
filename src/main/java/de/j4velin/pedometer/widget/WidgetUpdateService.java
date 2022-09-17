@@ -45,7 +45,7 @@ public class WidgetUpdateService extends JobIntentService {
                 appWidgetManager.getAppWidgetIds(new ComponentName(this, Widget.class));
         for (int appWidgetId : appWidgetIds) {
             appWidgetManager
-                    .updateAppWidget(appWidgetId, Widget.updateWidget(appWidgetId, this, steps));
+                    .updateAppWidget(appWidgetId, Widget.updateWidget(this, steps));
         }
     }
 }

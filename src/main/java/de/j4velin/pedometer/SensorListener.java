@@ -31,6 +31,7 @@ import android.os.IBinder;
 
 import java.util.Date;
 
+import de.j4velin.pedometer.receiver.ShutdownReceiver;
 import de.j4velin.pedometer.util.Logger;
 import de.j4velin.pedometer.util.Util;
 import de.j4velin.pedometer.widget.WidgetUpdateService;
@@ -52,7 +53,7 @@ public class SensorListener extends Service implements SensorEventListener {
     private static int lastSaveSteps;
     private static long lastSaveTime;
 
-    private final BroadcastReceiver shutdownReceiver = new ShutdownRecevier();
+    private final BroadcastReceiver shutdownReceiver = new ShutdownReceiver();
 
     @Override
     public void onAccuracyChanged(final Sensor sensor, int accuracy) {
@@ -65,14 +66,13 @@ public class SensorListener extends Service implements SensorEventListener {
     public void onSensorChanged(final SensorEvent event) {
         if (event.values[0] > Integer.MAX_VALUE) {
             if (BuildConfig.DEBUG) Logger.log("probably not a real value: " + event.values[0]);
-            return;
         } else {
             steps = (int) event.values[0];
             updateIfNecessary();
         }
     }
 
-    private boolean updateIfNecessary() {
+    private void updateIfNecessary() {
         if (steps > lastSaveSteps + SAVE_OFFSET_STEPS ||
                 (steps > 0 && System.currentTimeMillis() > lastSaveTime + SAVE_OFFSET_TIME)) {
             if (BuildConfig.DEBUG) Logger.log(
@@ -95,9 +95,6 @@ public class SensorListener extends Service implements SensorEventListener {
             lastSaveSteps = steps;
             lastSaveTime = System.currentTimeMillis();
             WidgetUpdateService.enqueueUpdate(this);
-            return true;
-        } else {
-            return false;
         }
     }
 
