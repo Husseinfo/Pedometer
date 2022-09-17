@@ -67,7 +67,7 @@ public class Fragment_Overview extends Fragment implements SensorEventListener {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        getActivity().startForegroundService(new Intent(getActivity(), SensorListener.class));
+        getActivity().startService(new Intent(getActivity(), SensorListener.class));
     }
 
     @Override
