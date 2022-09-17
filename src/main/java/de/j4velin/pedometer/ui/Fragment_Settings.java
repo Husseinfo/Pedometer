@@ -24,7 +24,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.Preference;
@@ -38,7 +37,6 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -50,7 +48,6 @@ import java.util.Locale;
 
 import de.j4velin.pedometer.Database;
 import de.j4velin.pedometer.R;
-import de.j4velin.pedometer.util.API23Wrapper;
 
 public class Fragment_Settings extends PreferenceFragment implements OnPreferenceClickListener {
 
@@ -148,7 +145,7 @@ public class Fragment_Settings extends PreferenceFragment implements OnPreferenc
                     public void onClick(DialogInterface dialog, int which) {
                         try {
                             prefs.edit().putFloat("stepsize_value",
-                                    Float.valueOf(value.getText().toString()))
+                                            Float.valueOf(value.getText().toString()))
                                     .putString("stepsize_unit",
                                             unit.getCheckedRadioButtonId() == R.id.cm ? "cm" : "ft")
                                     .apply();
@@ -177,12 +174,8 @@ public class Fragment_Settings extends PreferenceFragment implements OnPreferenc
                     } else {
                         exportCsv();
                     }
-                } else if (Build.VERSION.SDK_INT >= 23) {
-                    API23Wrapper.requestPermission(getActivity(),
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE});
                 } else {
-                    Toast.makeText(getActivity(), R.string.permission_external_storage,
-                            Toast.LENGTH_SHORT).show();
+                    getActivity().requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 42);
                 }
                 break;
         }
@@ -212,11 +205,11 @@ public class Fragment_Settings extends PreferenceFragment implements OnPreferenc
                                 writeToFile(f);
                             }
                         }).setNegativeButton(android.R.string.cancel, new OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).create().show();
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).create().show();
             } else {
                 writeToFile(f);
             }

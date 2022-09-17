@@ -25,7 +25,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -51,7 +50,6 @@ import de.j4velin.pedometer.BuildConfig;
 import de.j4velin.pedometer.Database;
 import de.j4velin.pedometer.R;
 import de.j4velin.pedometer.SensorListener;
-import de.j4velin.pedometer.util.API26Wrapper;
 import de.j4velin.pedometer.util.Logger;
 import de.j4velin.pedometer.util.Util;
 
@@ -69,12 +67,7 @@ public class Fragment_Overview extends Fragment implements SensorEventListener {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        if (Build.VERSION.SDK_INT >= 26) {
-            API26Wrapper.startForegroundService(getActivity(),
-                    new Intent(getActivity(), SensorListener.class));
-        } else {
-            getActivity().startService(new Intent(getActivity(), SensorListener.class));
-        }
+        getActivity().startForegroundService(new Intent(getActivity(), SensorListener.class));
     }
 
     @Override

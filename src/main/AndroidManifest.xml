@@ -71,15 +71,6 @@
                 android:value="Displays the steps taken today" />
         </service>
 
-        <activity
-            android:name=".widget.WidgetConfig"
-            android:exported="true"
-            android:theme="@style/Theme.Pedometer">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-            </intent-filter>
-        </activity>
-
         <receiver
             android:name=".widget.Widget"
             android:exported="true">

@@ -27,12 +27,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Build;
 import android.os.IBinder;
 
 import java.util.Date;
 
-import de.j4velin.pedometer.util.API23Wrapper;
 import de.j4velin.pedometer.util.Logger;
 import de.j4velin.pedometer.util.Util;
 import de.j4velin.pedometer.widget.WidgetUpdateService;
@@ -123,12 +121,7 @@ public class SensorListener extends Service implements SensorEventListener {
         PendingIntent pi = PendingIntent
                 .getService(getApplicationContext(), 2, new Intent(this, SensorListener.class),
                         PendingIntent.FLAG_UPDATE_CURRENT);
-        if (Build.VERSION.SDK_INT >= 23) {
-            API23Wrapper.setAlarmWhileIdle(am, AlarmManager.RTC, nextUpdate, pi);
-        } else {
-            am.set(AlarmManager.RTC, nextUpdate, pi);
-        }
-
+        am.setAndAllowWhileIdle(AlarmManager.RTC, nextUpdate, pi);
         return START_STICKY;
     }
 
