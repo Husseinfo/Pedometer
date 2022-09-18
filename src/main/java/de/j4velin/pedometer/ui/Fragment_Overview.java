@@ -67,7 +67,7 @@ public class Fragment_Overview extends Fragment implements SensorEventListener {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        getActivity().startService(new Intent(getActivity(), SensorListener.class));
+        getActivity().startForegroundService(new Intent(getActivity(), SensorListener.class));
     }
 
     @Override
@@ -103,7 +103,6 @@ public class Fragment_Overview extends Fragment implements SensorEventListener {
         super.onResume();
         Database db = Database.getInstance(getActivity());
 
-        if (BuildConfig.DEBUG) db.logState();
         // read todays offset
         todayOffset = db.getSteps(Util.getToday());
 
