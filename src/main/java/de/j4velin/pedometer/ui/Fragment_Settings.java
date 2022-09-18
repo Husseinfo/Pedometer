@@ -15,12 +15,10 @@
  */
 package de.j4velin.pedometer.ui;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
@@ -153,24 +151,14 @@ public class Fragment_Settings extends PreferenceFragment implements OnPreferenc
                 break;
             case R.string.import_title:
             case R.string.export_title:
-                if (hasWriteExternalPermission()) {
-                    if (preference.getTitleRes() == R.string.import_title) {
-                        importCsv();
-                    } else {
-                        exportCsv();
-                    }
+                if (preference.getTitleRes() == R.string.import_title) {
+                    importCsv();
                 } else {
-                    getActivity().requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 42);
+                    exportCsv();
                 }
                 break;
         }
         return false;
-    }
-
-    private boolean hasWriteExternalPermission() {
-        return getActivity().getPackageManager()
-                .checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        getActivity().getPackageName()) == PackageManager.PERMISSION_GRANTED;
     }
 
     /**
@@ -180,7 +168,7 @@ public class Fragment_Settings extends PreferenceFragment implements OnPreferenc
      */
     private void exportCsv() {
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            final File f = new File(Environment.getExternalStorageDirectory(), "Pedometer.csv");
+            final File f = new File(getContext().getApplicationContext().getFilesDir().getAbsolutePath(), "Pedometer.csv");
             if (f.exists()) {
                 new AlertDialog.Builder(getActivity()).setMessage(R.string.file_already_exists)
                         .setPositiveButton(android.R.string.ok, (dialog, which) -> {
@@ -204,7 +192,7 @@ public class Fragment_Settings extends PreferenceFragment implements OnPreferenc
      */
     private void importCsv() {
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File f = new File(Environment.getExternalStorageDirectory(), "Pedometer.csv");
+            File f = new File(getContext().getApplicationContext().getFilesDir().getAbsolutePath(), "Pedometer.csv");
             if (!f.exists() || !f.canRead()) {
                 new AlertDialog.Builder(getActivity())
                         .setMessage(getString(R.string.file_cant_read, f.getAbsolutePath()))
