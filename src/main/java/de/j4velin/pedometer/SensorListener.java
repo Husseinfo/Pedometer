@@ -17,21 +17,28 @@
 package de.j4velin.pedometer;
 
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 
+import java.text.NumberFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import de.j4velin.pedometer.receiver.ShutdownReceiver;
+import de.j4velin.pedometer.ui.Activity_Main;
 import de.j4velin.pedometer.util.Logger;
 import de.j4velin.pedometer.util.Util;
 import de.j4velin.pedometer.widget.WidgetUpdateService;
@@ -45,6 +52,8 @@ import de.j4velin.pedometer.widget.WidgetUpdateService;
  */
 public class SensorListener extends Service implements SensorEventListener {
 
+    public final static String NOTIFICATION_CHANNEL_ID = "Notification";
+    public final static int NOTIFICATION_ID = 1;
     private final static long MICROSECONDS_IN_ONE_MINUTE = 60000000;
     private final static long SAVE_OFFSET_TIME = AlarmManager.INTERVAL_HOUR;
     private final static int SAVE_OFFSET_STEPS = 500;
@@ -72,7 +81,10 @@ public class SensorListener extends Service implements SensorEventListener {
         }
     }
 
-    private void updateIfNecessary() {
+    /**
+     * @return true, if notification was updated
+     */
+    private boolean updateIfNecessary() {
         if (steps > lastSaveSteps + SAVE_OFFSET_STEPS ||
                 (steps > 0 && System.currentTimeMillis() > lastSaveTime + SAVE_OFFSET_TIME)) {
             if (BuildConfig.DEBUG) Logger.log(
@@ -87,15 +99,23 @@ public class SensorListener extends Service implements SensorEventListener {
                 if (pauseDifference > 0) {
                     // update pauseCount for the new day
                     getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                            .putInt("pauseCount", steps).commit();
+                            .putInt("pauseCount", steps).apply();
                 }
             }
             db.saveCurrentSteps(steps);
             db.close();
             lastSaveSteps = steps;
             lastSaveTime = System.currentTimeMillis();
+            showNotification(); // update notification
             WidgetUpdateService.enqueueUpdate(this);
+            return true;
+        } else {
+            return false;
         }
+    }
+
+    private void showNotification() {
+        startForeground(NOTIFICATION_ID, getNotification(this));
     }
 
     @Override
@@ -107,17 +127,19 @@ public class SensorListener extends Service implements SensorEventListener {
     public int onStartCommand(final Intent intent, int flags, int startId) {
         reRegisterSensor();
         registerBroadcastReceiver();
-        updateIfNecessary();
+        if (!updateIfNecessary()) {
+            showNotification();
+        }
 
         // restart service every hour to save the current step count
         long nextUpdate = Math.min(Util.getTomorrow(),
                 System.currentTimeMillis() + AlarmManager.INTERVAL_HOUR);
-        if (BuildConfig.DEBUG) Logger.log("next update: " + new Date(nextUpdate).toLocaleString());
+        if (BuildConfig.DEBUG) Logger.log("next update: " + new Date(nextUpdate));
         AlarmManager am =
                 (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         PendingIntent pi = PendingIntent
                 .getService(getApplicationContext(), 2, new Intent(this, SensorListener.class),
-                        PendingIntent.FLAG_UPDATE_CURRENT);
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         am.setAndAllowWhileIdle(AlarmManager.RTC, nextUpdate, pi);
         return START_STICKY;
     }
@@ -135,7 +157,7 @@ public class SensorListener extends Service implements SensorEventListener {
         // Restart service in 500 ms
         ((AlarmManager) getSystemService(Context.ALARM_SERVICE))
                 .set(AlarmManager.RTC, System.currentTimeMillis() + 500, PendingIntent
-                        .getService(this, 3, new Intent(this, SensorListener.class), 0));
+                        .getService(this, 3, new Intent(this, SensorListener.class), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
     }
 
     @Override
@@ -151,9 +173,41 @@ public class SensorListener extends Service implements SensorEventListener {
         }
     }
 
+    public static Notification getNotification(final Context context) {
+        if (BuildConfig.DEBUG) Logger.log("getNotification");
+        SharedPreferences prefs = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE);
+        int goal = prefs.getInt("goal", 10000);
+        Database db = Database.getInstance(context);
+        int today_offset = db.getSteps(Util.getToday());
+        if (steps == 0)
+            steps = db.getCurrentSteps(); // use saved value if we haven't anything better
+        db.close();
+        Notification.Builder notificationBuilder = getNotificationBuilder(context);
+        if (steps > 0) {
+            if (today_offset == Integer.MIN_VALUE) today_offset = -steps;
+            NumberFormat format = NumberFormat.getInstance(Locale.getDefault());
+            notificationBuilder.setProgress(goal, today_offset + steps, false).setContentText(
+                    today_offset + steps >= goal ?
+                            context.getString(R.string.goal_reached_notification,
+                                    format.format((today_offset + steps))) :
+                            context.getString(R.string.notification_text,
+                                    format.format((goal - today_offset - steps)))).setContentTitle(
+                    format.format(today_offset + steps) + " " + context.getString(R.string.steps));
+        } else { // still no step value?
+            notificationBuilder.setContentText(
+                            context.getString(R.string.your_progress_will_be_shown_here_soon))
+                    .setContentTitle(context.getString(R.string.notification_title));
+        }
+        notificationBuilder.setShowWhen(false).setContentIntent(PendingIntent
+                        .getActivity(context, 0, new Intent(context, Activity_Main.class),
+                                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
+                .setSmallIcon(R.drawable.ic_baseline_directions_walk_24)
+                .setOngoing(true);
+        return notificationBuilder.build();
+    }
 
     private void registerBroadcastReceiver() {
-        if (BuildConfig.DEBUG) Logger.log("register broadcastreceiver");
+        if (BuildConfig.DEBUG) Logger.log("register broadcast receiver");
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_SHUTDOWN);
         registerReceiver(shutdownReceiver, filter);
@@ -178,5 +232,20 @@ public class SensorListener extends Service implements SensorEventListener {
         // enable batching with delay of max 5 min
         sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
                 SensorManager.SENSOR_DELAY_NORMAL, (int) (5 * MICROSECONDS_IN_ONE_MINUTE));
+    }
+
+    public static Notification.Builder getNotificationBuilder(final Context context) {
+        NotificationManager manager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationChannel channel =
+                new NotificationChannel(NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_ID,
+                        NotificationManager.IMPORTANCE_NONE);
+        channel.setImportance(NotificationManager.IMPORTANCE_MIN);
+        channel.enableLights(false);
+        channel.enableVibration(false);
+        channel.setBypassDnd(false);
+        channel.setSound(null, null);
+        manager.createNotificationChannel(channel);
+        return new Notification.Builder(context, NOTIFICATION_CHANNEL_ID);
     }
 }
