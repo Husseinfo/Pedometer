@@ -39,7 +39,7 @@ public class DashClock extends DashClockExtension {
         Database db = Database.getInstance(this);
         int steps = Math.max(db.getCurrentSteps() + db.getSteps(Util.getToday()), 0);
         data.visible(true).status(Fragment_Overview.formatter.format(steps))
-                .icon(R.drawable.ic_dashclock)
+                .icon(R.drawable.ic_baseline_directions_walk_24)
                 .clickIntent(new Intent(DashClock.this, Activity_Main.class));
         db.close();
         publishUpdate(data);

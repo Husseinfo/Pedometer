@@ -18,7 +18,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_baseline_directions_walk_24"
         android:label="@string/app_name"
-        android:theme="@android:style/Theme.DeviceDefault.Light.DarkActionBar"
+        android:theme="@style/Theme.Pedometer"
         tools:replace="label">
 
         <activity
