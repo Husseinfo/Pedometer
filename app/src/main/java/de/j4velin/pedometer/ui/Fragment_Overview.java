@@ -30,10 +30,11 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.google.android.material.appbar.MaterialToolbar;
 
 import org.eazegraph.lib.charts.BarChart;
 import org.eazegraph.lib.charts.PieChart;
@@ -73,11 +74,27 @@ public class Fragment_Overview extends Fragment implements SensorEventListener {
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.fragment_overview, null);
-        stepsView = (TextView) v.findViewById(R.id.steps);
-        totalView = (TextView) v.findViewById(R.id.total);
-        averageView = (TextView) v.findViewById(R.id.average);
+        stepsView = v.findViewById(R.id.steps);
+        totalView = v.findViewById(R.id.total);
+        averageView = v.findViewById(R.id.average);
 
-        pg = (PieChart) v.findViewById(R.id.graph);
+        pg = v.findViewById(R.id.graph);
+
+        ((MaterialToolbar) v.findViewById(R.id.topAppBar)).setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case android.R.id.home:
+                    getFragmentManager().popBackStackImmediate();
+                case R.id.action_settings:
+                    getFragmentManager().beginTransaction()
+                            .replace(android.R.id.content, new Fragment_Settings()).addToBackStack(null)
+                            .commit();
+                    break;
+                case R.id.action_split_count:
+                    Dialog_Split.getDialog(getActivity(),
+                            total_start + Math.max(todayOffset + since_boot, 0)).show();
+            }
+            return true;
+        });
 
         // slice for the steps taken today
         sliceCurrent = new PieModel("", 0, Color.parseColor("#99CC00"));
@@ -177,18 +194,6 @@ public class Fragment_Overview extends Fragment implements SensorEventListener {
     }
 
     @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_split_count:
-                Dialog_Split.getDialog(getActivity(),
-                        total_start + Math.max(todayOffset + since_boot, 0)).show();
-                return true;
-            default:
-                return ((Activity_Main) getActivity()).optionsItemSelected(item);
-        }
-    }
-
-    @Override
     public void onAccuracyChanged(final Sensor sensor, int accuracy) {
         // won't happen
     }
@@ -269,7 +274,7 @@ public class Fragment_Overview extends Fragment implements SensorEventListener {
      */
     private void updateBars() {
         SimpleDateFormat df = new SimpleDateFormat("E", Locale.getDefault());
-        BarChart barChart = (BarChart) getView().findViewById(R.id.bargraph);
+        BarChart barChart = getView().findViewById(R.id.bargraph);
         if (barChart.getData().size() > 0) barChart.clearChart();
         int steps;
         float distance, stepsize = Fragment_Settings.DEFAULT_STEP_SIZE;

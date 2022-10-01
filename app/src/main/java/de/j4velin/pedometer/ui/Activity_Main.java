@@ -21,10 +21,11 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import androidx.core.content.PermissionChecker;
 import androidx.fragment.app.FragmentActivity;
+
+import com.google.android.material.appbar.MaterialToolbar;
 
 import de.j4velin.pedometer.BuildConfig;
 import de.j4velin.pedometer.R;
@@ -63,19 +64,5 @@ public class Activity_Main extends FragmentActivity {
         } else {
             finish();
         }
-    }
-
-    public boolean optionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                getFragmentManager().popBackStackImmediate();
-                break;
-            case R.id.action_settings:
-                getFragmentManager().beginTransaction()
-                        .replace(android.R.id.content, new Fragment_Settings()).addToBackStack(null)
-                        .commit();
-                break;
-        }
-        return true;
     }
 }

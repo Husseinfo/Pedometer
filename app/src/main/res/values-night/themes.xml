@@ -1,0 +1,21 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.Pedometer" parent="Theme.Material3.DayNight">
+
+        <item name="colorPrimaryDark">@color/primaryVariant</item>
+        <item name="colorError">@android:color/holo_red_dark</item>
+        <item name="android:colorBackground">@color/background_night</item>
+
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primaryVariant</item>
+        <item name="colorOnPrimary">@android:color/black</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondaryVariant">@color/secondaryVariant</item>
+        <item name="colorOnSecondary">@android:color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/primaryVariant</item>
+        <!-- Customize your theme here. -->
+    </style>
+</resources>

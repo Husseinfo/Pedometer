@@ -27,7 +27,6 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -86,11 +85,6 @@ public class Fragment_Settings extends PreferenceFragment implements OnPreferenc
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.action_settings).setVisible(false);
         menu.findItem(R.id.action_split_count).setVisible(false);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        return ((Activity_Main) getActivity()).optionsItemSelected(item);
     }
 
     @Override
